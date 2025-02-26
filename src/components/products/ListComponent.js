@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getList } from "../../api/productApi";
 import useCustomMove from "../../hooks/useCustomMove";
 import PageComponent from "../common/PageComponent";
-import FetchingModal from "../common/FetchingModal";
-import { API_SERVER_HOST } from "../../api/todoApi";
-const host = API_SERVER_HOST; // P267
+
 const initState = {
   dtoList: [],
   pageNumList: [],
   pageRequestDTO: null,
   prev: false,
   next: false,
-  totalCount: 0,
+  totoalCount: 0,
   prevPage: 0,
   nextPage: 0,
   totalPage: 0,
@@ -19,52 +17,42 @@ const initState = {
 };
 
 const ListComponent = () => {
-  const { page, size, refresh, moveToList, moveToRead } = useCustomMove();
-  console.log("page:", page, "size", size);
+  const { page, size, refresh, moveToList, moveToRead } = useCustomMove(); //refresh
+
+  //serverData는 나중에 사용
   const [serverData, setServerData] = useState(initState);
-  const [fetching, setFetching] = useState(false); //  p266
 
   useEffect(() => {
-    setFetching(true);
     getList({ page, size }).then((data) => {
       console.log(data);
       setServerData(data);
-      setFetching(false);
     });
   }, [page, size, refresh]);
 
   return (
     <div className="border-2 border-blue-100 mt-10 mr-2 ml-2">
-      <h1> 제품 목록 콤포넌트</h1>
-      {fetching ? <FetchingModal /> : <></>}
       <div className="flex flex-wrap mx-auto justify-center p-6">
-        {serverData.dtoList.map((i) => (
+        {serverData.dtoList.map((todo) => (
           <div
-            key={i.pno}
-            className="w-full min-w-[400px] p-2 m-2 rounded shadow-md"
-            onClick={() => moveToRead(i.pno)}
+            key={todo.tno}
+            className="w-full min-w-[400px]  p-2 m-2 rounded shadow-md"
+            onClick={() => moveToRead(todo.tno)} //이벤트 처리 추가
           >
-            <div className="flex flex-col h-full">
-              <div className="font-extrabold text-2xl p-2 w-full">{i.pno} </div>
-              <div className="text-2xl m-1 p-2 w-full flex flex-col">
-                <div className="w-full overflow-hidden">
-                  <img
-                    alt="product"
-                    className="m-auto rounded-md w-60"
-                    src={`${host}/api/products/view/s_${i.uploadFileNames[0]}`}
-                  />
-                </div>
-                <div className="bottom-0 font-extrabold  bg-white">
-                  <div className="text-center p-1">이름 : {i.pname}</div>
-                </div>
-                <div className="bottom-0 font-extrabold bg-white">
-                  <div className="text-center p-1">가격 :{i.price}</div>
-                </div>
+            <div className="flex ">
+              <div className="font-extrabold text-2xl p-2 w-1/12">
+                {todo.pno}
+              </div>
+              <div className="text-1xl m-1 p-2 w-8/12 font-extrabold">
+                {todo.pname}
+              </div>
+              <div className="text-1xl m-1 p-2 w-2/10 font-medium">
+                {todo.pdesc}
               </div>
             </div>
           </div>
         ))}
       </div>
+
       <PageComponent
         serverData={serverData}
         movePage={moveToList}
